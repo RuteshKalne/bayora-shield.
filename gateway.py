@@ -15,12 +15,7 @@ MAX_PROMPT_LENGTH = 5000
 
 @app.get("/")
 def home():
-    return jsonify({
-        "service": "Bayora Shield API Gateway",
-        "status": "running",
-        "version": "1.0",
-    })
-
+    return send_from_directory("static", "index.html")
 @app.get("/dashboard")
 def dashboard():
     return send_from_directory("static", "index.html")
