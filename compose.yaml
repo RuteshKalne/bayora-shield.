@@ -1,0 +1,105 @@
+services:
+  bayora-shield:
+    build: .
+    container_name: bayora-shield
+
+    ports:
+      - "127.0.0.1:5000:5000"
+
+    environment:
+      AUDIT_LEDGER_FILE: /app/data/audit.jsonl
+
+    volumes:
+      - bayora-audit:/app/data
+
+    read_only: true
+
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+
+    cap_drop:
+      - ALL
+
+    security_opt:
+      - no-new-privileges:true
+
+    pids_limit: 100
+
+    restart: unless-stopped
+
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=3)"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    networks:
+      - default
+      - bayora-redteam-net
+
+  red-team-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.redteam
+
+    container_name: bayora-red-team
+
+    depends_on:
+      bayora-shield:
+        condition: service_healthy
+
+    networks:
+      - bayora-redteam-net
+
+    read_only: true
+
+    cap_drop:
+      - ALL
+
+    security_opt:
+      - no-new-privileges:true
+
+    pids_limit: 50
+
+    restart: "no"
+
+  blue-team:
+    build:
+      context: .
+      dockerfile: Dockerfile.blueteam
+
+    container_name: bayora-blue-team
+
+    depends_on:
+      bayora-shield:
+        condition: service_healthy
+
+    networks:
+      - bayora-redteam-net
+
+    read_only: true
+
+    cap_drop:
+      - ALL
+
+    security_opt:
+      - no-new-privileges:true
+
+    pids_limit: 50
+
+    restart: unless-stopped
+
+volumes:
+  bayora-audit:
+
+networks:
+  default:
+
+  bayora-redteam-net:
+    name: bayora-redteam-net
+    internal: true

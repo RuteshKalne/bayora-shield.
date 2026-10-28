@@ -1,0 +1,14 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+COPY blue_team_monitor.py .
+
+RUN useradd --no-create-home --uid 10003 blueteam
+
+USER 10003
+
+CMD ["python", "-u", "blue_team_monitor.py"]
