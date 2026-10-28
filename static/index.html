@@ -1,0 +1,276 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bayora Shield | Security Console</title>
+<style>
+:root {
+  --bg:#0a0f1a; --panel:#111a2a; --panel2:#151f32;
+  --border:#26344b; --text:#edf3ff; --muted:#91a1bb;
+  --cyan:#55d6e8; --green:#45dfa0; --red:#ff657a;
+  --amber:#ffc66d;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;
+gap:16px;padding:22px 5%;border-bottom:1px solid var(--border);
+background:#0d1422}
+.brand{display:flex;align-items:center;gap:13px}
+.logo{display:grid;place-items:center;width:43px;height:43px;
+border:1px solid var(--cyan);border-radius:12px;color:var(--cyan);
+font-size:23px;font-weight:800}
+h1{font-size:20px;margin:0;letter-spacing:.4px}
+.subtitle{color:var(--muted);font-size:12px}
+.badge{border:1px solid var(--border);border-radius:30px;padding:7px 12px;
+color:var(--muted);font-size:12px}
+main{max-width:1200px;margin:auto;padding:28px 22px 55px}
+.intro{margin-bottom:24px}
+h2{font-size:25px;margin:0 0 5px}
+p{margin-top:5px}
+.muted{color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+gap:14px;margin:22px 0}
+.card,.panel{background:var(--panel);border:1px solid var(--border);
+border-radius:15px;padding:19px}
+.label{color:var(--muted);font-size:12px;text-transform:uppercase;
+letter-spacing:1px}
+.value{font-size:24px;font-weight:750;margin:8px 0 3px}
+.small{font-size:12px;color:var(--muted)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+background:var(--amber);margin-right:7px}
+.dot.ok{background:var(--green)} .dot.bad{background:var(--red)}
+.layout{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+.panel{margin-bottom:16px}
+.panel h3{margin:0 0 5px;font-size:17px}
+.panel p{font-size:13px;color:var(--muted);margin:0 0 18px}
+label{display:block;color:#bdc9dc;font-size:13px;margin:14px 0 6px}
+input,select,textarea{width:100%;background:#0b1220;border:1px solid #30405b;
+border-radius:9px;color:var(--text);padding:11px 12px;font:inherit}
+textarea{min-height:112px;resize:vertical}
+button{border:0;border-radius:9px;background:var(--cyan);color:#07131d;
+padding:11px 15px;font-weight:750;cursor:pointer;margin-top:14px}
+button.secondary{background:#24334a;color:var(--text);border:1px solid #394b66}
+button:disabled{opacity:.55;cursor:wait}
+.result{display:none;margin-top:16px;padding:14px;border-radius:10px;
+background:#0b1220;border:1px solid var(--border);overflow-wrap:anywhere}
+.result.show{display:block}
+.result.allow{border-color:var(--green)} .result.block{border-color:var(--red)}
+.decision{font-size:20px;font-weight:850;margin-bottom:5px}
+.allow .decision{color:var(--green)} .block .decision{color:var(--red)}
+.result pre{white-space:pre-wrap;overflow-wrap:anywhere;color:#c5d3e8;
+font:12px/1.6 ui-monospace,monospace}
+.actions{display:flex;gap:9px;flex-wrap:wrap}
+.events{display:grid;gap:9px;margin-top:12px}
+.event{padding:11px 12px;border-radius:9px;background:#0b1220;
+border:1px solid var(--border);font-size:12px;overflow-wrap:anywhere}
+.event strong{color:var(--cyan)}
+footer{border-top:1px solid var(--border);padding:20px;text-align:center;
+color:var(--muted);font-size:12px}
+.note{border-left:3px solid var(--amber);padding:10px 12px;
+background:#211b13;color:#e6d0a8;border-radius:4px;font-size:12px;margin-top:15px}
+@media(max-width:850px){.cards{grid-template-columns:repeat(2,1fr)}
+.layout{grid-template-columns:1fr}header{padding:17px 4%}}
+@media(max-width:440px){.cards{grid-template-columns:1fr}main{padding:20px 14px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">B</div>
+    <div><h1>BAYORA SHIELD</h1><div class="subtitle">ADVERSARIAL AI SECURITY CONSOLE</div></div>
+  </div>
+  <div class="badge">HIH 26 · SECURITY PROTOTYPE</div>
+</header>
+
+<main>
+  <section class="intro">
+    <h2>Security Operations</h2>
+    <div class="muted">Monitor the API gateway, evaluate prompts, test session rules and verify audit integrity.</div>
+  </section>
+
+  <section class="cards">
+    <div class="card"><div class="label">Gateway status</div>
+      <div class="value" id="gatewayStatus">Checking…</div>
+      <div class="small" id="gatewayDetail"><span class="dot"></span>Contacting API</div></div>
+    <div class="card"><div class="label">Audit integrity</div>
+      <div class="value" id="ledgerStatus">Checking…</div>
+      <div class="small" id="ledgerDetail">Verifying hash chain</div></div>
+    <div class="card"><div class="label">Audit events</div>
+      <div class="value" id="eventCount">—</div>
+      <div class="small">Events reported by the API</div></div>
+    <div class="card"><div class="label">AI model</div>
+      <div class="value">Demo mode</div>
+      <div class="small">No external model connected</div></div>
+  </section>
+
+  <div class="layout">
+    <div>
+      <section class="panel">
+        <h3>Prompt Security Evaluation</h3>
+        <p>Submit a prompt to the existing rule-based guardrail API.</p>
+        <label for="session">Session</label>
+        <select id="session">
+          <option>session-alpha</option><option>session-bravo</option>
+          <option>session-charlie</option>
+        </select>
+        <label for="scenario">Scenario</label>
+        <select id="scenario">
+          <option value="safe">Safe prompt — inspect for known indicators</option>
+          <option value="jailbreak">Jailbreak attempt</option>
+          <option value="exfiltration">Cross-session exfiltration</option>
+          <option value="recon">Network reconnaissance</option>
+          <option value="injection">Prompt injection</option>
+        </select>
+        <label for="prompt">Prompt text</label>
+        <textarea id="prompt" maxlength="5000" placeholder="Enter a prompt to evaluate…">What is a firewall?</textarea>
+        <div class="small" id="charCount">22 / 5000 characters</div>
+        <button id="evaluateBtn" onclick="evaluatePrompt()">Evaluate prompt</button>
+        <div id="evalResult" class="result" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="panel">
+        <h3>Session Isolation Check</h3>
+        <p>Test the prototype's same-session and cross-session access policy.</p>
+        <label for="sourceSession">Source session</label>
+        <select id="sourceSession">
+          <option>session-alpha</option><option>session-bravo</option>
+          <option>session-charlie</option>
+        </select>
+        <label for="targetSession">Target session</label>
+        <select id="targetSession">
+          <option>session-bravo</option><option>session-alpha</option>
+          <option>session-charlie</option>
+        </select>
+        <button onclick="checkSession()">Check access</button>
+        <div id="sessionResult" class="result" role="status" aria-live="polite"></div>
+        <div class="note">Demo limitation: session IDs are supplied by the caller. This check does not authenticate identity or provide production-grade isolation.</div>
+      </section>
+    </div>
+
+    <div>
+      <section class="panel">
+        <h3>Audit Ledger</h3>
+        <p>Verify the existing hash-linked audit ledger.</p>
+        <div class="actions">
+          <button onclick="verifyLedger()">Verify integrity</button>
+          <button class="secondary" onclick="loadEvents()">Refresh events</button>
+        </div>
+        <div id="auditResult" class="result" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="panel">
+        <h3>Recent Audit Events</h3>
+        <p>Events returned by the gateway's ledger endpoint.</p>
+        <div id="events" class="events"><div class="event">Loading events…</div></div>
+      </section>
+
+      <section class="panel">
+        <h3>Prototype Security Notes</h3>
+        <div class="event">01 · Rule-based prompt detection</div>
+        <div class="event">02 · SHA-256 hash-linked audit events</div>
+        <div class="event">03 · Docker container hardening</div>
+        <div class="event">04 · Internal Red-Team network</div>
+        <div class="note">A valid hash chain detects tested tampering, but an attacker able to rewrite the entire ledger and recompute hashes may evade detection. This prototype is not production-ready.</div>
+      </section>
+    </div>
+  </div>
+</main>
+<footer>Bayora Shield · HIH 26 · Defensive AI security prototype · Demo responses only</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+async function api(path, options={}) {
+  const response = await fetch(path, {
+    ...options,
+    headers: {'Content-Type':'application/json', ...(options.headers||{})}
+  });
+  const data = await response.json().catch(() => ({error:'Invalid server response'}));
+  if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+  return data;
+}
+function showResult(id, decision, details, data) {
+  const el=$(id);
+  el.className='result show '+(decision==='ALLOW'?'allow':decision==='BLOCK'?'block':'');
+  el.replaceChildren();
+  const title=document.createElement('div');
+  title.className='decision'; title.textContent=decision || 'RESULT';
+  const text=document.createElement('div'); text.textContent=details || '';
+  el.append(title,text);
+  if(data){
+    const pre=document.createElement('pre');
+    pre.textContent=JSON.stringify(data,null,2); el.append(pre);
+  }
+}
+async function refreshHealth() {
+  try {
+    await api('/health');
+    $('gatewayStatus').textContent='ONLINE';
+    $('gatewayDetail').innerHTML='<span class="dot ok"></span>API responding';
+  } catch(e) {
+    $('gatewayStatus').textContent='OFFLINE';
+    $('gatewayDetail').innerHTML='<span class="dot bad"></span>'+e.message;
+  }
+}
+async function verifyLedger() {
+  $('auditResult').className='result show'; $('auditResult').textContent='Verifying…';
+  try {
+    const d=await api('/ledger/verify');
+    $('eventCount').textContent=d.event_count;
+    $('ledgerStatus').textContent=d.valid?'VALID':'INVALID';
+    $('ledgerDetail').innerHTML=d.valid?'<span class="dot ok"></span>Hash-chain verification passed':'<span class="dot bad"></span>Verification failed';
+    showResult('auditResult',d.valid?'VALID':'INVALID',
+      d.valid?'Ledger verification succeeded.':'Ledger verification failed.',d);
+  } catch(e) {
+    $('ledgerStatus').textContent='ERROR';
+    $('ledgerDetail').textContent='Could not verify';
+    showResult('auditResult','ERROR',e.message);
+  }
+}
+async function evaluatePrompt() {
+  const btn=$('evaluateBtn'), prompt=$('prompt').value;
+  btn.disabled=true; btn.textContent='Evaluating…';
+  try {
+    const d=await api('/v1/evaluate',{method:'POST',body:JSON.stringify({
+      session_id:$('session').value, scenario:$('scenario').value, prompt
+    })});
+    showResult('evalResult',d.decision,d.details,d);
+    await verifyLedger(); await loadEvents();
+  } catch(e) { showResult('evalResult','ERROR',e.message); }
+  finally {btn.disabled=false;btn.textContent='Evaluate prompt';}
+}
+async function checkSession() {
+  try {
+    const d=await api('/v1/sessions/check',{method:'POST',body:JSON.stringify({
+      source_session:$('sourceSession').value,target_session:$('targetSession').value
+    })});
+    showResult('sessionResult',d.decision,d.details,d);
+    await verifyLedger(); await loadEvents();
+  } catch(e) {showResult('sessionResult','ERROR',e.message);}
+}
+async function loadEvents() {
+  const box=$('events'); box.replaceChildren();
+  try {
+    const d=await api('/ledger');
+    const events=Array.isArray(d.events)?d.events:[];
+    if(!events.length){box.textContent='No events recorded yet.';return;}
+    events.slice(-8).reverse().forEach(ev=>{
+      const item=document.createElement('div'); item.className='event';
+      const strong=document.createElement('strong');
+      strong.textContent=ev.event_type || ev.event || ev.type || 'Audit event';
+      const pre=document.createElement('pre');
+      pre.style.cssText='white-space:pre-wrap;margin:5px 0 0;color:#91a1bb';
+      pre.textContent=JSON.stringify(ev);
+      item.append(strong,pre); box.append(item);
+    });
+  } catch(e) {
+    box.textContent='Could not load events: '+e.message;
+  }
+}
+$('prompt').addEventListener('input',()=>{$('charCount').textContent=$('prompt').value.length+' / 5000 characters';});
+refreshHealth(); verifyLedger(); loadEvents();
+setInterval(refreshHealth,15000);
+</script>
+</body>
+</html>
